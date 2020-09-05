@@ -1,4 +1,4 @@
-# KubernetesClusterUpgradeV1.18toV1.19InUbuntu1604
+# KubernetesClusterUpgradeV1.18toV1.19InUbuntu1804
 This Kubernetes Cluster shows the Kubernets Cluster Upgradation Steps from version 1.18 to version 1.19, 3 VMs running on Ubuntu 16.04.  
 The Cluster consists of 1 Master Node and 2 Worker Nodes.  
 First of all use <b>Vagrant</b> configuration tool to spinup the 3 VMs using <b>Ubuntu</b> 16.04 as OS.  
