@@ -57,25 +57,28 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documen
 Download the <b>etcdctl</b> binary from the URL "https://github.com/coreos/etcd/releases/download/v<Version No>/etcd-v<Version No>-linux-amd64.tar.gz" to connect to ETCD DB of the cluster.  
 <b>Note that you find the etcd version running inside the cluster via cmd: docker images</b>  
 
-<b>Create some keys in the etcd DB before taking backup.</b>  
-ETCDCTL_API=3  etcdctl --endpoints=https://127.0.0.1:2379 \  
+<b>Create some keys in the etcd DB before taking backup.</b>
+
+    ETCDCTL_API=3  etcdctl --endpoints=https://127.0.0.1:2379 \  
     --cacert=/etc/kubernetes/pki/etcd/ca.crt \  
     --cert=/etc/kubernetes/pki/etcd/healthcheck-client.crt \  
     --key=/etc/kubernetes/pki/etcd/healthcheck-client.key \  
     put foo bar
     
-<b>Run the below cmd to take etcd backup.</b>  
-ETCDCTL_API=3  etcdctl --endpoints=https://127.0.0.1:2379 \  
+<b>Run the below cmd to take etcd backup.</b>
+
+    ETCDCTL_API=3  etcdctl --endpoints=https://127.0.0.1:2379 \  
     --cacert=/etc/kubernetes/pki/etcd/ca.crt \  
     --cert=/etc/kubernetes/pki/etcd/healthcheck-client.crt \  
     --key=/etc/kubernetes/pki/etcd/healthcheck-client.key \  
     snapshot save /tmp/etcd-snapshot-latest-sanjib.db
     
-Verify the backup file exists under /tmp directory and as well verify the backup is not corrupt via the below cmd.  
-ETCDCTL_API=3 etcdctl snapshot status -w table /tmp/etcd-snapshot-latest-sanjib.db
+    Verify the backup file exists under /tmp directory and as well verify the backup is not corrupt via the below cmd.  
+    ETCDCTL_API=3 etcdctl snapshot status -w table /tmp/etcd-snapshot-latest-sanjib.db
 
 <b> Restore cmd for the etcd DB if there is a need to restoration. </b>  
-ETCDCTL_API=3 etcdctl --endpoints=https://[127.0.0.1]:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt \  
+
+    ETCDCTL_API=3 etcdctl --endpoints=https://[127.0.0.1]:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt \  
      --name=master \  
      --cert=/etc/kubernetes/pki/etcd/server.crt --key=/etc/kubernetes/pki/etcd/server.key \  
      --data-dir /var/lib/etcd-from-backup \  
@@ -83,6 +86,15 @@ ETCDCTL_API=3 etcdctl --endpoints=https://[127.0.0.1]:2379 --cacert=/etc/kuberne
      --initial-cluster-token=etcd-cluster-1 \  
      --initial-advertise-peer-urls=https://127.0.0.1:2380 \  
      snapshot restore /tmp/etcd-snapshot-latest-sanjib.db
+
+<b>After restoring fetch the foo key and its value from the restored etcd DB, to verify DB.</b>  
+
+    ETCDCTL_API=3  etcdctl --endpoints=https://127.0.0.1:2379 \  
+    --cacert=/etc/kubernetes/pki/etcd/ca.crt \  
+    --cert=/etc/kubernetes/pki/etcd/healthcheck-client.crt \  
+    --key=/etc/kubernetes/pki/etcd/healthcheck-client.key \  
+    get foo
+     
 
 ### Step 8:-  
 Upgrading Kubernetes Cluster to version 1.19  
