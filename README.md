@@ -1,9 +1,12 @@
 # KubernetesClusterUpgradeV1.18toV1.19OnUbuntu1804
-This Kubernetes Cluster shows the Kubernets Cluster Upgradation Steps from version 1.18 to version 1.19, 2 VMs running on Ubuntu 18.04.  
-The Cluster consists of 1 Master Node and 1 Worker Node.  
-First of all use <b>Vagrant</b> configuration tool to spinup the 2 VMs using <b>Ubuntu</b> 18.04 as OS.  
-Use the code in this repo to spinup the VMs, make sure you have <b>Vagrant</b> installed in your machine.  
-Then using <b>kubeadm</b> utility, spinup the Kubernetes v1.18 Cluster in the 2 VMs and then approach the <b>kubeadm</b> upgrade process to upgrade the cluster to version v1.19.
+    The below information has been referenced from official Kubernetes Documnetation site.  
+    This Kubernetes Cluster shows the Kubernets Cluster Upgradation Steps from version 1.18 to version 1.19, 
+    2 VMs running on Ubuntu 18.04. The Cluster consists of 1 Master Node and 1 Worker Node.  
+
+    First of all use Vagrant configuration tool to spinup the 2 VMs using Ubuntu 18.04 as OS.  
+    Use the code in this repo to spinup the VMs, make sure you have Vagrant installed in your machine.  
+    Then using kubeadm utility, spinup the Kubernetes v1.18 Cluster in the 2 VMs 
+    and then approach the kubeadm upgrade process to upgrade the cluster to version v1.19.
 
 Once the VM's are running and Docker already installed via Vagrant, let us install the Kubernetes cluster via Kubeadm.  
 Step 1-4 should be executed in all the VMs in Cluster.
@@ -109,12 +112,13 @@ apt-get install -y --allow-change-held-packages kubeadm=1.19.0-00
 Verify kubeadm version via command:- <b>kubeadm version</b>  
 
 #### Upgrading Master Node..  
-kubectl drain <MASTER NODE> --ignore-daemonsets
-sudo kubeadm upgrade plan
-sudo kubeadm upgrade apply v1.19.0
+kubectl drain <MASTER NODE> --ignore-daemonsets  
+sudo kubeadm upgrade plan  
+sudo kubeadm upgrade apply v1.19.0  
 kubectl uncordon <MASTER NODE>
   
 #### Upgrading Worker Nodes.. 
+Upgrade kubeadm in Worker Node.  
 sudo apt-mark unhold kubeadm && \  
 sudo apt-get update && sudo apt-get install -y kubeadm=1.19.0-00 && \  
 sudo apt-mark hold kubeadm  
@@ -125,6 +129,7 @@ kubectl drain <WORKER NODE> --ignore-daemonsets [This cmd should be run on Maste
 
 sudo kubeadm upgrade node  
 
+Upgrade the kubelet and kubectl on the worker nodes.  
 sudo apt-mark unhold kubelet kubectl && \  
 sudo apt-get update && sudo apt-get install -y kubelet=1.19.0-00 kubectl=1.19.0-00 && \  
 sudo apt-mark hold kubelet kubectl  
