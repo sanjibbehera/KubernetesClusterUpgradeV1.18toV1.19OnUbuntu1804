@@ -10,7 +10,9 @@ Step 1-4 should be executed in all the VMs in Cluster.
 
 ### Step 1:-  
 Find out if <b>br_netfilter</b> is enabled in the VMs via the command:- <b>lsmod | grep br_netfilter</b>  
-If no results, then enable via the command:- <b>sudo modprobe br_netfilter</b>
+If no results, then enable via the command:- <b>sudo modprobe br_netfilter</b>  
+<b>Why it is required</b>  
+br_netfilter is the module required to enable transparent masquerading and to facilitate Virtual Extensible LAN (VxLAN) traffic for communication between Kubernetes pods across the cluster.
 
 ### Step 2:-  
 Linux iptables to correctly see bridged traffic, set the below in sysctl config.  
@@ -20,10 +22,15 @@ net.bridge.bridge-nf-call-iptables = 1
 EOF  
 sudo sysctl --system
 
-#### Note that swap space is disabled via the command "sudo swapoff -a"
+<b>Note that swap space should be disabled..</b>  
+Disable Swap:- "sudo swapoff -a"  
+<b>Why it is required</b>  
+The Kubernetes scheduler determines the best available node on which to deploy newly created pods.   
+If memory swapping is allowed to occur on a host system, this can lead to performance and stability issues within Kubernetes.  
+For this reason, Kubernetes requires that you disable swap in the host system.
 
 ### Step 3:-  
-Installing kubeadm, kubelet and kubectl for Ubuntu OS.  
+Installing kubeadm, kubelet and kubectl version 1.18.2 for Ubuntu OS.  
 sudo apt-get update && sudo apt-get install -y apt-transport-https curl  
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -  
 cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list  
@@ -46,7 +53,38 @@ sudo kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address
 Install <b>Flannel</b> pod network.  
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 
-### Step 7:-  
+### Step 7: Take etcd backup to be on safer side..  
+Download the <b>etcdctl</b> binary from the URL "https://github.com/coreos/etcd/releases/download/v<Version No>/etcd-v<Version No>-linux-amd64.tar.gz" to connect to ETCD DB of the cluster.  
+<b>Note that you find the etcd version running inside the cluster via cmd: docker images</b>  
+
+<b>Create some keys in the etcd DB before taking backup.</b>  
+ETCDCTL_API=3  etcdctl --endpoints=https://127.0.0.1:2379 \  
+    --cacert=/etc/kubernetes/pki/etcd/ca.crt \  
+    --cert=/etc/kubernetes/pki/etcd/healthcheck-client.crt \  
+    --key=/etc/kubernetes/pki/etcd/healthcheck-client.key \  
+    put foo bar
+    
+<b>Run the below cmd to take etcd backup.</b>  
+ETCDCTL_API=3  etcdctl --endpoints=https://127.0.0.1:2379 \  
+    --cacert=/etc/kubernetes/pki/etcd/ca.crt \  
+    --cert=/etc/kubernetes/pki/etcd/healthcheck-client.crt \  
+    --key=/etc/kubernetes/pki/etcd/healthcheck-client.key \  
+    snapshot save /tmp/etcd-snapshot-latest-sanjib.db
+    
+Verify the backup file exists under /tmp directory and as well verify the backup is not corrupt via the below cmd.  
+ETCDCTL_API=3 etcdctl snapshot status -w table /tmp/etcd-snapshot-latest-sanjib.db
+
+<b> Restore cmd for the etcd DB if there is a need to restoration. </b>  
+ETCDCTL_API=3 etcdctl --endpoints=https://[127.0.0.1]:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt \  
+     --name=master \  
+     --cert=/etc/kubernetes/pki/etcd/server.crt --key=/etc/kubernetes/pki/etcd/server.key \  
+     --data-dir /var/lib/etcd-from-backup \  
+     --initial-cluster=master=https://127.0.0.1:2380 \  
+     --initial-cluster-token=etcd-cluster-1 \  
+     --initial-advertise-peer-urls=https://127.0.0.1:2380 \  
+     snapshot restore /tmp/etcd-snapshot-latest-sanjib.db
+
+### Step 8:-  
 Upgrading Kubernetes Cluster to version 1.19  
 sudo apt update  
 sudo apt-cache madison kubeadm  
@@ -71,7 +109,7 @@ sudo apt-mark hold kubeadm
 
 sudo apt-get update && \  
 sudo apt-get install -y --allow-change-held-packages kubeadm=1.19.0-00  
-kubectl drain <WORKER NODE> --ignore-daemonsets [on Master Node..]
+kubectl drain <WORKER NODE> --ignore-daemonsets [This cmd should be run on Master Node..]
 
 sudo kubeadm upgrade node  
 
@@ -85,4 +123,4 @@ sudo apt-get install -y --allow-change-held-packages kubelet=1.19.0-00 kubectl=1
 sudo systemctl daemon-reload  
 sudo systemctl restart kubelet  
 
-kubectl uncordon kubeadm-ubuntu18-worker [Master Node..]
+kubectl uncordon kubeadm-ubuntu18-worker [This cmd should be run on Master Node..]
