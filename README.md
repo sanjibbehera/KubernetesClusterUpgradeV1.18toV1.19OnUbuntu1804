@@ -1,12 +1,15 @@
 # KubernetesClusterUpgradeV1.18toV1.19OnUbuntu1804
     The below information has been referenced from official Kubernetes Documentation site.  
-    This Kubernetes Cluster shows the Kubernets Cluster Upgradation Steps from version 1.18 to version 1.19, 
+    This Kubernetes Cluster shows the Kubernetes Cluster Upgradation Steps from version 1.18 to version 1.19, 
     2 VMs running on Ubuntu 18.04. The Cluster consists of 1 Master Node and 1 Worker Node.  
 
     First of all use Vagrant configuration tool to spinup the 2 VMs using Ubuntu 18.04 as OS.  
-    Use the code in this repo to spinup the VMs, make sure you have Vagrant installed in your machine.  
+    Use the code in this repo to spinup the VMs, make sure you have Vagrant and VirtualBox installed in your machine.  
     Then using kubeadm utility, spinup the Kubernetes v1.18 Cluster in the 2 VMs 
     and then approach the kubeadm upgrade process to upgrade the cluster to version v1.19.
+    
+    The basic assumption of this README is that you have spinup 2 Ubntu VMs using the repo code and 
+    are ready to spinup the k8s cluster using Kubeadm.
 
 Once the VM's are running and Docker already installed via Vagrant configuration scripts, let us install the Kubernetes cluster via Kubeadm.  
 Step 1-4 should be executed in all the VMs in Cluster.
