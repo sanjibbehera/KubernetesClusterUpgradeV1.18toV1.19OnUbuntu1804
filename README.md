@@ -51,7 +51,7 @@ sudo systemctl daemon-reload
 sudo systemctl restart kubelet
 
 ### Step 5:-  
-Initializing your control-plane node.  
+Initializing your control-plane node using the below command [This command should be executed in Master Node].  
 sudo kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=192.168.19.10  
 #### Note: Copy the join command for the worker nodes, once the above command completes.
 
