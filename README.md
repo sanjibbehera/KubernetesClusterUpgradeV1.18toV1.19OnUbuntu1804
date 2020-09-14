@@ -1,5 +1,5 @@
 # KubernetesClusterUpgradeV1.18toV1.19OnUbuntu1804
-    The below information has been referenced from official Kubernetes Documnetation site.  
+    The below information has been referenced from official Kubernetes Documentation site.  
     This Kubernetes Cluster shows the Kubernets Cluster Upgradation Steps from version 1.18 to version 1.19, 
     2 VMs running on Ubuntu 18.04. The Cluster consists of 1 Master Node and 1 Worker Node.  
 
@@ -8,7 +8,7 @@
     Then using kubeadm utility, spinup the Kubernetes v1.18 Cluster in the 2 VMs 
     and then approach the kubeadm upgrade process to upgrade the cluster to version v1.19.
 
-Once the VM's are running and Docker already installed via Vagrant, let us install the Kubernetes cluster via Kubeadm.  
+Once the VM's are running and Docker already installed via Vagrant configuration scripts, let us install the Kubernetes cluster via Kubeadm.  
 Step 1-4 should be executed in all the VMs in Cluster.
 
 ### Step 1:-  
@@ -89,6 +89,12 @@ Download the <b>etcdctl</b> binary from the URL "https://github.com/coreos/etcd/
      --initial-cluster-token=etcd-cluster-1 \  
      --initial-advertise-peer-urls=https://127.0.0.1:2380 \  
      snapshot restore /tmp/etcd-snapshot-latest-sanjib.db
+     
+<b> Make the below necessary changes in etcd.yaml in the manifests folder.</b>
+    
+    --data-dir=/var/lib/etcd-from-backup
+    - mountPath: /var/lib/etcd-from-backup [under volumeMounts section]
+    path: /var/lib/etcd [under hostPath section]
 
 <b>After restoring fetch the foo key and its value from the restored etcd DB, to verify DB.</b>  
 
