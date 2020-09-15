@@ -1,6 +1,6 @@
 # KubernetesClusterUpgradeV1.18toV1.19OnUbuntu1804
     The below information has been referenced from official Kubernetes Documentation site.  
-    This Kubernetes Cluster shows the Kubernetes Cluster Upgradation Steps from version 1.18 to version 1.19, 
+    This Kubernetes Cluster shows the Kubernetes Cluster Upgradation Steps from version 1.18.2 to version 1.19.0, 
     2 VMs running on Ubuntu 18.04. The Cluster consists of 1 Master Node and 1 Worker Node.  
 
     First of all use Vagrant configuration tool to spinup the 2 VMs using Ubuntu 18.04 as OS.  
@@ -15,7 +15,7 @@ Once the VM's are running and Docker already installed via Vagrant configuration
 Step 1-4 should be executed in all the VMs in Cluster.
 
 ### Step 1:-  
-Find out if <b>br_netfilter</b> is enabled in the VMs via the command:- <b>lsmod | grep br_netfilter</b>  
+Find out if <b>br_netfilter</b> module is enabled in the VMs via the command:- <b>lsmod | grep br_netfilter</b>  
 If no results, then enable via the command:- <b>sudo modprobe br_netfilter</b>  
 <b>Why it is required</b>  
 br_netfilter is the module required to enable transparent masquerading and to facilitate Virtual Extensible LAN (VxLAN) traffic for communication between Kubernetes pods across the cluster.
@@ -53,7 +53,8 @@ sudo systemctl restart kubelet
 ### Step 5:-  
 Initializing your control-plane node using the below command [This command should be executed in Master Node].  
 sudo kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=192.168.19.10  
-#### Note: Copy the join command for the worker nodes, once the above command completes and executeds the same in worker node.
+#### Note: Copy the join command for the worker nodes, once the above command completes and executeds the same in worker node.  
+#### Additional Note: the Cidr IP Range is taken as "10.244.0.0/16", due to the requirement of Flannel POD Network Installation.
 
 ### Step 6:-  
 Install <b>Flannel</b> pod network.  
@@ -97,7 +98,7 @@ Download the <b>etcdctl</b> binary from the URL "https://github.com/coreos/etcd/
     
     --data-dir=/var/lib/etcd-from-backup
     - mountPath: /var/lib/etcd-from-backup [under volumeMounts section]
-    path: /var/lib/etcd [under hostPath section]
+    path: /var/lib/etcd-from-backup [under hostPath section]
 
 <b>After restoring fetch the foo key and its value from the restored etcd DB, to verify DB.</b>  
 
