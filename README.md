@@ -110,7 +110,7 @@ Download the <b>etcdctl</b> binary from the URL "https://github.com/coreos/etcd/
      
 
 ### Step 8:-  
-Upgrading Kubernetes Cluster to version 1.19  
+<b>Upgrading Kubernetes Cluster to version 1.19.0 from 1.18.2</b>, execute the below commands in master nodes.  
 sudo apt update  
 sudo apt-cache madison kubeadm  
 sudo apt-mark unhold kubeadm && \  
@@ -128,7 +128,7 @@ sudo kubeadm upgrade apply v1.19.0
 kubectl uncordon <MASTER NODE>
   
 #### Upgrading Worker Nodes.. 
-Upgrade kubeadm in Worker Node.  
+<b>Upgrade kubeadm in Worker Node.</b>  
 sudo apt-mark unhold kubeadm && \  
 sudo apt-get update && sudo apt-get install -y kubeadm=1.19.0-00 && \  
 sudo apt-mark hold kubeadm  
@@ -139,7 +139,7 @@ kubectl drain <WORKER NODE> --ignore-daemonsets [This cmd should be run on Maste
 
 sudo kubeadm upgrade node  
 
-Upgrade the kubelet and kubectl on the worker nodes.  
+<b>Upgrade the kubelet and kubectl on the worker nodes.</b>  
 sudo apt-mark unhold kubelet kubectl && \  
 sudo apt-get update && sudo apt-get install -y kubelet=1.19.0-00 kubectl=1.19.0-00 && \  
 sudo apt-mark hold kubelet kubectl  
